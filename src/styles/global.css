@@ -102,3 +102,23 @@ p {
   line-height: 1.5;
   max-width: 700px;
 }
+
+
+/* Scrollbar fino e estilizado (funciona na maioria dos navegadores modernos) */
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0d0d1a; /* fundo escuro */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #7b0f17; /* vermelho escuro */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #b71c1c; /* vermelho mais forte no hover */
+}

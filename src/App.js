@@ -6,11 +6,9 @@ import Filmes from "./paginas/filmes";
 import Series from "./paginas/series";
 import Sobre from "./paginas/sobre";
 
-import "./styles/global.css";  // Importa CSS global uma vez aqui
-
 function App() {
   return (
-    <Router>
+    <Router basename="/cineverse">
       <header className="bg-[#0d0d1a] text-white flex items-center justify-between px-6 py-4">
         <div className="text-red-500 font-bold text-xl">CineVerse</div>
         <nav className="flex gap-6">
