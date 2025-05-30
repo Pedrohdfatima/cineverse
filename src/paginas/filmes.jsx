@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import styles from "../styles/filmes.module.css";
 
-export default function filmes() {
+export default function Filmes() {
   const [movies, setMovies] = useState([]);
 
   useEffect(() => {
@@ -19,17 +20,11 @@ export default function filmes() {
   }, []);
 
   return (
-    <div
-      className="min-h-screen p-6"
-      style={{
-        background: "linear-gradient(to right, black, #7b0f17)",
-        color: "gold",
-      }}
-    >
+    <div className={styles.container}>
       <h1 className="text-2xl font-bold mb-4">Filmes em alta</h1>
-      <div className="flex gap-4 overflow-x-auto">
+      <div className={styles.cardList}>
         {movies.map((movie) => (
-          <div key={movie.id} className="min-w-[150px] h-[220px] bg-white rounded">
+          <div key={movie.id} className={styles.card}>
             {movie.poster_path && (
               <img
                 src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}

@@ -1,9 +1,12 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import Home from "./pages/home";
-import Filmes from "./pages/filmes";
-import Series from "./pages/series";
-import Sobre from "./pages/sobre";
+
+import Home from "./paginas/home";
+import Filmes from "./paginas/filmes";
+import Series from "./paginas/series";
+import Sobre from "./paginas/sobre";
+
+import "./styles/global.css";  // Importa CSS global uma vez aqui
 
 function App() {
   return (

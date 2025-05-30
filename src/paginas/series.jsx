@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import styles from "../styles/series.module.css";
 
-export default function series() {
+export default function Series() {
   const [series, setSeries] = useState([]);
 
   useEffect(() => {
@@ -19,17 +20,11 @@ export default function series() {
   }, []);
 
   return (
-    <div
-      className="min-h-screen p-6"
-      style={{
-        background: "linear-gradient(to right, black, #7b0f17)",
-        color: "gold",
-      }}
-    >
+    <div className={styles.container}>
       <h1 className="text-2xl font-bold mb-4">Séries em alta</h1>
-      <div className="flex gap-4 overflow-x-auto">
+      <div className={styles.cardList}>
         {series.map((serie) => (
-          <div key={serie.id} className="min-w-[150px] h-[220px] bg-white rounded">
+          <div key={serie.id} className={styles.card}>
             {serie.poster_path && (
               <img
                 src={`https://image.tmdb.org/t/p/w200${serie.poster_path}`}

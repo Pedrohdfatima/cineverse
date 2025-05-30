@@ -1,0 +1,20 @@
+.container {
+  padding: 24px;
+  min-height: 100vh;
+  background: linear-gradient(to right, black, #7b0f17);
+  color: gold;
+}
+
+.cardList {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+}
+
+.card {
+  min-width: 150px;
+  height: 220px;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
