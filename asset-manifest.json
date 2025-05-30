@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/cineverse/static/css/main.94ab5e76.css",
+    "main.js": "/cineverse/static/js/main.cdbb2478.js",
+    "static/js/453.90a00726.chunk.js": "/cineverse/static/js/453.90a00726.chunk.js",
+    "index.html": "/cineverse/index.html",
+    "main.94ab5e76.css.map": "/cineverse/static/css/main.94ab5e76.css.map",
+    "main.cdbb2478.js.map": "/cineverse/static/js/main.cdbb2478.js.map",
+    "453.90a00726.chunk.js.map": "/cineverse/static/js/453.90a00726.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.94ab5e76.css",
+    "static/js/main.cdbb2478.js"
+  ]
+}
