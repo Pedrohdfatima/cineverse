@@ -5,6 +5,7 @@ import Home from "./paginas/home";
 import Filmes from "./paginas/filmes";
 import Series from "./paginas/series";
 import Sobre from "./paginas/sobre";
+import "./styles/global.css";
 
 function App() {
   return (

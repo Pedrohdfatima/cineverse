@@ -1,17 +1,18 @@
 .container {
-  padding: 48px 64px;
   min-height: 100vh;
-  background: linear-gradient(to right, #0d0d1a, #7b0f17);
+  padding: 1.5rem;
+  background: linear-gradient(to right, black, #7b0f17);
   color: gold;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
 }
 
 .text {
-  max-width: 700px;
+  max-width: 40rem;
   color: white;
-  font-size: 1.1rem;
-  line-height: 1.7;
-  margin-top: 12px;
+  line-height: 1.5;
 }

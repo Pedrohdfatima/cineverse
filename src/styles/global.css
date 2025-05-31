@@ -1,124 +1,138 @@
-/* Reset básico */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
+  margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #0d0d1a;
-  color: white;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  text-decoration: none;
-  color: white;
-  transition: color 0.3s ease;
-}
-
-a:hover {
-  color: #7b0f17; /* vermelho */
-}
-
-.gold-text {
+  background: linear-gradient(to right, black, #7b0f17);
   color: gold;
+  overflow-x: hidden;
 }
 
-.custom-gradient-bg {
-  background: linear-gradient(to right, #0d0d1a, #7b0f17);
-}
-
-/* Header estilizado */
 header {
-  background-color: #0d0d1a;
-  border-bottom: 1px solid #222;
-  padding: 16px 24px;
+  background: #0d0d1a;
+  color: white;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
+  border-bottom: 2px solid #7b0f17;
 }
 
 header .logo {
-  font-weight: 900;
+  color: #e50914;
+  font-weight: 700;
   font-size: 1.5rem;
-  color: #7b0f17;
-  letter-spacing: 2px;
-  cursor: pointer;
+  letter-spacing: 1.5px;
+}
+
+nav {
+  display: flex;
+  gap: 24px;
 }
 
 nav a {
+  color: white;
+  text-transform: uppercase;
   font-weight: 600;
-  font-size: 1rem;
-  margin-right: 24px;
-  padding-bottom: 4px;
-  border-bottom: 2px solid transparent;
-  transition: all 0.3s ease;
+  text-decoration: none;
+  transition: color 0.3s ease;
 }
 
-nav a:hover,
-nav a.active {
-  color: #7b0f17;
-  border-bottom: 2px solid #7b0f17;
+nav a:hover {
+  color: #e50914;
 }
 
 input[type="text"] {
   padding: 6px 12px;
   border-radius: 20px;
   border: none;
-  outline: none;
-  background-color: #222;
-  color: white;
-  width: 180px;
-  transition: background-color 0.3s ease;
+  width: 160px;
+  max-width: 100%;
+  font-size: 1rem;
+  transition: box-shadow 0.3s ease;
 }
 
 input[type="text"]:focus {
-  background-color: #7b0f17;
-  color: white;
+  outline: none;
+  box-shadow: 0 0 6px #e50914;
 }
 
-/* Scroll bar customizada para os containers horizontais */
-::-webkit-scrollbar {
-  height: 8px;
+main {
+  padding: 24px;
 }
 
-::-webkit-scrollbar-track {
-  background: #0d0d1a;
+/* Container horizontal para scroll */
+.scroll-container {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 16px;
 }
 
-::-webkit-scrollbar-thumb {
-  background-color: #7b0f17;
+.scroll-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background-color: #e50914;
   border-radius: 10px;
 }
 
-/* Texto padrão */
-p {
-  line-height: 1.5;
-  max-width: 700px;
+/* Cards básicos dos filmes */
+.card {
+  min-width: 150px;
+  height: 220px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Títulos das seções */
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: gold;
+}
+
+/* Responsividade simples */
+@media (max-width: 768px) {
+  header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  nav {
+    gap: 12px;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .card {
+    min-width: 120px;
+    height: 180px;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
 }
 
 
-/* Scrollbar fino e estilizado (funciona na maioria dos navegadores modernos) */
-::-webkit-scrollbar {
-  height: 8px;
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #0d0d1a; /* fundo escuro */
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #7b0f17; /* vermelho escuro */
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: #b71c1c; /* vermelho mais forte no hover */
-}
