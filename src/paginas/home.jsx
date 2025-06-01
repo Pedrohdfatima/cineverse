@@ -1,47 +1,74 @@
 import { useEffect, useState } from "react";
-import { getPopularMovies, getPopularSeries } from "../api/tmdb";
+import axios from "axios";
+import { Link } from "react-router-dom";
 import styles from "../styles/home.module.css";
 
+const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
+const LANG = "pt-BR";
+
 export default function Home() {
-  const [movies, setMovies] = useState([]);
-  const [series, setSeries] = useState([]);
+  const [topGeral, setTopGeral] = useState([]);
+  const [filmesPopulares, setFilmesPopulares] = useState([]);
+  const [seriesPopulares, setSeriesPopulares] = useState([]);
+  const [melhoresFilmes, setMelhoresFilmes] = useState([]);
 
   useEffect(() => {
-    getPopularMovies().then(setMovies);
-    getPopularSeries().then(setSeries);
+    const fetchDados = async () => {
+      try {
+        const [resGeral, resFilmes, resSeries, resTopRated] = await Promise.all([
+          axios.get("https://api.themoviedb.org/3/trending/all/day", {
+            params: { api_key: API_KEY, language: LANG },
+          }),
+          axios.get("https://api.themoviedb.org/3/movie/popular", {
+            params: { api_key: API_KEY, language: LANG },
+          }),
+          axios.get("https://api.themoviedb.org/3/tv/popular", {
+            params: { api_key: API_KEY, language: LANG },
+          }),
+          axios.get("https://api.themoviedb.org/3/movie/top_rated", {
+            params: { api_key: API_KEY, language: LANG },
+          }),
+        ]);
+
+        setTopGeral(resGeral.data.results.slice(0, 10));
+        setFilmesPopulares(resFilmes.data.results.slice(0, 10));
+        setSeriesPopulares(resSeries.data.results.slice(0, 10));
+        setMelhoresFilmes(resTopRated.data.results.slice(0, 10));
+      } catch (err) {
+        console.error("Erro ao carregar dados:", err);
+      }
+    };
+
+    fetchDados();
   }, []);
+
+  const renderSecao = (titulo, dados) => (
+    <>
+      <h2 className={styles.sectionTitle}>{titulo}</h2>
+      <div className={styles.scrollContainer}>
+        {dados.map((item) => (
+          <Link
+            to={`/detalhes/${item.media_type || item.title ? "movie" : "tv"}/${item.id}`}
+            key={item.id}
+            className={styles.card}
+            title={item.title || item.name}
+          >
+            <img
+              src={`https://image.tmdb.org/t/p/w300${item.poster_path}`}
+              alt={item.title || item.name}
+            />
+          </Link>
+        ))}
+      </div>
+    </>
+  );
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.sectionTitle}>Filmes em alta</h1>
-      <div className={styles.scrollContainer}>
-        {movies.map((movie) => (
-          <div key={movie.id} className={styles.card}>
-            {movie.poster_path && (
-              <img
-                src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                alt={movie.title}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-
-      <h1 className={styles.sectionTitle} style={{ marginTop: "2rem" }}>
-        Séries em alta
-      </h1>
-      <div className={styles.scrollContainer}>
-        {series.map((serie) => (
-          <div key={serie.id} className={styles.card}>
-            {serie.poster_path && (
-              <img
-                src={`https://image.tmdb.org/t/p/w200${serie.poster_path}`}
-                alt={serie.name}
-              />
-            )}
-          </div>
-        ))}
-      </div>
+      {renderSecao("Top 10 do Dia", topGeral)}
+      {renderSecao("Filmes Populares", filmesPopulares)}
+      {renderSecao("Séries Populares", seriesPopulares)}
+      {renderSecao("Melhores Avaliados", melhoresFilmes)}
     </div>
   );
 }
