@@ -1,15 +1,16 @@
 {
   "files": {
-    "main.css": "/cineverse/static/css/main.25347c62.css",
-    "main.js": "/cineverse/static/js/main.8e2ee3a6.js",
+    "main.css": "/cineverse/static/css/main.505158ba.css",
+    "main.js": "/cineverse/static/js/main.e48189ac.js",
     "static/js/453.90a00726.chunk.js": "/cineverse/static/js/453.90a00726.chunk.js",
+    "static/media/logo.png": "/cineverse/static/media/logo.e55ca4b7a1a0d52929e6.png",
     "index.html": "/cineverse/index.html",
-    "main.25347c62.css.map": "/cineverse/static/css/main.25347c62.css.map",
-    "main.8e2ee3a6.js.map": "/cineverse/static/js/main.8e2ee3a6.js.map",
+    "main.505158ba.css.map": "/cineverse/static/css/main.505158ba.css.map",
+    "main.e48189ac.js.map": "/cineverse/static/js/main.e48189ac.js.map",
     "453.90a00726.chunk.js.map": "/cineverse/static/js/453.90a00726.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.25347c62.css",
-    "static/js/main.8e2ee3a6.js"
+    "static/css/main.505158ba.css",
+    "static/js/main.e48189ac.js"
   ]
 }
