@@ -1,73 +1,120 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import BannerSlider from "../components/BannerSlider";
 import { Link } from "react-router-dom";
 import styles from "../styles/series.module.css";
 
 const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
 const LANG = "pt-BR";
 
-export default function Series() {
-  const [seriesPopulares, setSeriesPopulares] = useState([]);
-  const [melhoresSeries, setMelhoresSeries] = useState([]);
+// Gêneros de séries (baseado na TMDB)
+const GENRES = [
+  { id: 10759, name: "Ação & Aventura" },
+  { id: 16, name: "Animação" },
+  { id: 35, name: "Comédia" },
+  { id: 80, name: "Crime" },
+  { id: 99, name: "Documentário" },
+  { id: 18, name: "Drama" },
+  { id: 10751, name: "Família" },
+  { id: 10762, name: "Infantil" },
+  { id: 9648, name: "Mistério" },
+  { id: 10763, name: "Notícias" },
+  { id: 10764, name: "Reality" },
+  { id: 10765, name: "Sci-Fi & Fantasia" },
+  { id: 10766, name: "Soap" },
+  { id: 10767, name: "Talk" },
+  { id: 10768, name: "Guerra & Política" },
+];
+
+function HorizontalScroll({ title, fetchUrl, params = {} }) {
+  const [items, setItems] = useState([]);
+  const [page, setPage] = useState(1);
+  const loader = useRef(null);
+
+  const fetchItems = async () => {
+    try {
+      const res = await axios.get(fetchUrl, {
+        params: { api_key: API_KEY, language: LANG, page, ...params },
+      });
+      setItems((prev) => [...prev, ...res.data.results]);
+    } catch (error) {
+      console.error(`Erro ao buscar itens da seção ${title}:`, error);
+    }
+  };
 
   useEffect(() => {
-    const fetchSeries = async () => {
-      try {
-        const [resPopulares, resTopRated] = await Promise.all([
-          axios.get("https://api.themoviedb.org/3/tv/popular", {
-            params: { api_key: API_KEY, language: LANG },
-          }),
-          axios.get("https://api.themoviedb.org/3/tv/top_rated", {
-            params: { api_key: API_KEY, language: LANG },
-          }),
-        ]);
-        setSeriesPopulares(resPopulares.data.results.slice(0, 10));
-        setMelhoresSeries(resTopRated.data.results.slice(0, 10));
-      } catch (error) {
-        console.error("Erro ao buscar séries:", error);
-      }
-    };
+    fetchItems();
+  }, [page]);
 
-    fetchSeries();
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setPage((prev) => prev + 1);
+        }
+      },
+      { rootMargin: "100px" }
+    );
+
+    if (loader.current) observer.observe(loader.current);
+    return () => {
+      if (loader.current) observer.unobserve(loader.current);
+    };
   }, []);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.sliderWrapper}>
-        <BannerSlider dados={seriesPopulares} />
-      </div>
-
-      <h2 className={styles.sectionTitle}>Séries Populares</h2>
+    <>
+      <h2 className={styles.sectionTitle}>{title}</h2>
       <div className={styles.scrollContainer}>
-        {seriesPopulares.map((serie) => (
-         <Link
-      to={`/detalhes/tv/${serie.id}`}
-      key={serie.id}
-      className={styles.card}
-      title={serie.name}
-    >
-      <img
-        src={`https://image.tmdb.org/t/p/w300${serie.poster_path}`}
-        alt={serie.name}
-      />
-      <p className={styles.cardTitle}>{serie.name || "Sem nome"}</p>
-    </Link>
-        ))}
-      </div>
-
-      <h2 className={styles.sectionTitle}>Melhores Avaliadas</h2>
-      <div className={styles.scrollContainer}>
-        {melhoresSeries.map((serie) => (
-          <div key={serie.id} className={styles.card}>
+        {items.map((item) => (
+          <Link
+            to={`/detalhes/tv/${item.id}`}
+            key={item.id}
+            className={styles.card}
+            title={item.name}
+          >
             <img
-              src={`https://image.tmdb.org/t/p/w300${serie.poster_path}`}
-              alt={serie.name}
+              src={`https://image.tmdb.org/t/p/w300${item.poster_path}`}
+              alt={item.name}
             />
-            <p className={styles.cardTitle}>{serie.name || "Sem nome"}</p>
-          </div>
+            <p className={styles.cardTitle}>{item.name || "Sem título"}</p>
+          </Link>
         ))}
+        <div ref={loader} style={{ width: "30px" }} />
       </div>
+    </>
+  );
+}
+
+export default function Series() {
+  return (
+    <div className={styles.container}>
+      {/* Categorias principais */}
+      <HorizontalScroll
+        title="Séries Populares"
+        fetchUrl="https://api.themoviedb.org/3/tv/popular"
+      />
+      <HorizontalScroll
+        title="Melhores Avaliadas"
+        fetchUrl="https://api.themoviedb.org/3/tv/top_rated"
+      />
+      <HorizontalScroll
+        title="No Ar Agora"
+        fetchUrl="https://api.themoviedb.org/3/tv/on_the_air"
+      />
+      <HorizontalScroll
+        title="Séries Em Breve"
+        fetchUrl="https://api.themoviedb.org/3/tv/airing_today"
+      />
+
+      {/* Séries por gêneros */}
+      {GENRES.map(({ id, name }) => (
+        <HorizontalScroll
+          key={id}
+          title={`Séries de ${name}`}
+          fetchUrl="https://api.themoviedb.org/3/discover/tv"
+          params={{ with_genres: id }}
+        />
+      ))}
     </div>
   );
 }

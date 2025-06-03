@@ -1,14 +1,14 @@
 .container {
   min-height: 100vh;
-  padding: 0 1rem; /* deixa um padding horizontal */
+  padding: 0 1rem;
   background: linear-gradient(to right, black, #7b0f17);
   color: gold;
 }
 
 .sliderWrapper {
-  width: 100vw;          /* largura total da viewport */
-  margin-left: -1rem;    /* negativo igual ao padding horizontal do container */
-  margin-right: -1rem;   /* para compensar o padding do container também */
+  width: 100vw;
+  margin-left: -1rem;
+  margin-right: -1rem;
   overflow: hidden;
 }
 
@@ -22,39 +22,23 @@
   display: flex;
   gap: 1rem;
   overflow-x: auto;
-  padding-bottom: 12px; /* espaço pra barra */
+  padding-bottom: 12px;
   scrollbar-width: thin;
   scrollbar-color: #c40f1b #111;
-  -webkit-overflow-scrolling: touch; /* suaviza o scroll no iOS */
 }
 
 .scrollContainer::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Edge: esconde scrollbar nativa */
-    height: 12px;  /* deixa a barra maior pra aparecer */
-  background: #111; /* cor de fundo da barra */
+  height: 8px;
+  background: transparent;
 }
 
-/* Barra de scroll custom */
-.customScrollbar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 12px;
-  background: #111;
-  border-radius: 6px;
-}
-
-.customScrollbarThumb {
-  height: 100%;
+.scrollContainer::-webkit-scrollbar-thumb {
   background-color: #c40f1b;
-  border-radius: 6px;
-  cursor: pointer;
-  width: 50px; /* largura inicial */
-  transition: background-color 0.3s;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
 }
 
-.customScrollbarThumb:hover {
+.scrollContainer::-webkit-scrollbar-thumb:hover {
   background-color: #cc2e31;
 }
 
