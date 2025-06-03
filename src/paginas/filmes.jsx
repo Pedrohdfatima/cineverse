@@ -1,79 +1,78 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import BannerSlider from "../components/BannerSlider";
+import styles from "../styles/filmes.module.css";
 import { Link } from "react-router-dom";
-import styles from "../styles/home.module.css";
+
+const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
+const LANG = "pt-BR";
 
 export default function Filmes() {
   const [filmesPopulares, setFilmesPopulares] = useState([]);
-  const [filmesTop, setFilmesTop] = useState([]);
+  const [melhoresFilmes, setMelhoresFilmes] = useState([]);
 
   useEffect(() => {
-    const fetchFilmesPopulares = async () => {
-      const res = await axios.get(
-        "https://api.themoviedb.org/3/movie/popular",
-        {
-          params: {
-            api_key: process.env.REACT_APP_TMDB_API_KEY,
-            language: "pt-BR",
-          },
-        }
-      );
-      setFilmesPopulares(res.data.results.slice(0, 10));
+    const fetchFilmes = async () => {
+      try {
+        const [resPopulares, resTopRated] = await Promise.all([
+          axios.get("https://api.themoviedb.org/3/movie/popular", {
+            params: { api_key: API_KEY, language: LANG },
+          }),
+          axios.get("https://api.themoviedb.org/3/movie/top_rated", {
+            params: { api_key: API_KEY, language: LANG },
+          }),
+        ]);
+        setFilmesPopulares(resPopulares.data.results.slice(0, 10));
+        setMelhoresFilmes(resTopRated.data.results.slice(0, 10));
+      } catch (error) {
+        console.error("Erro ao buscar filmes:", error);
+      }
     };
 
-    const fetchFilmesTop = async () => {
-      const res = await axios.get(
-        "https://api.themoviedb.org/3/movie/top_rated",
-        {
-          params: {
-            api_key: process.env.REACT_APP_TMDB_API_KEY,
-            language: "pt-BR",
-          },
-        }
-      );
-      setFilmesTop(res.data.results.slice(0, 10));
-    };
-
-    fetchFilmesPopulares();
-    fetchFilmesTop();
+    fetchFilmes();
   }, []);
 
   return (
     <div className={styles.container}>
+      <div className={styles.sliderWrapper}>
+        <BannerSlider dados={filmesPopulares} />
+      </div>
+
       <h2 className={styles.sectionTitle}>Filmes Populares</h2>
       <div className={styles.scrollContainer}>
-        {filmesPopulares.map((item) => (
+        {filmesPopulares.map((filme) => (
           <Link
-            to={`/detalhes/movie/${item.id}`}
-            key={item.id}
+            to={`/detalhes/movie/${filme.id}`}
+            key={filme.id}
             className={styles.card}
-            title={item.title}
+            title={filme.title}
           >
             <img
-              src={`https://image.tmdb.org/t/p/w300${item.poster_path}`}
-              alt={item.title}
+              src={`https://image.tmdb.org/t/p/w300${filme.poster_path}`}
+              alt={filme.title}
             />
+            <p className={styles.cardTitle}>{filme.title || "Sem título"}</p>
           </Link>
         ))}
       </div>
 
-      <h2 className={styles.sectionTitle}>Filmes Mais Bem Avaliados</h2>
+      <h2 className={styles.sectionTitle}>Melhores Avaliados</h2>
       <div className={styles.scrollContainer}>
-        {filmesTop.map((item) => (
+        {melhoresFilmes.map((filme) => (
           <Link
-            to={`/detalhes/movie/${item.id}`}
-            key={item.id}
+            to={`/detalhes/movie/${filme.id}`}
+            key={filme.id}
             className={styles.card}
-            title={item.title}
+            title={filme.title}
           >
             <img
-              src={`https://image.tmdb.org/t/p/w300${item.poster_path}`}
-              alt={item.title}
+              src={`https://image.tmdb.org/t/p/w300${filme.poster_path}`}
+              alt={filme.title}
             />
+            <p className={styles.cardTitle}>{filme.title || "Sem título"}</p>
           </Link>
         ))}
       </div>
     </div>
   );
 }
-    

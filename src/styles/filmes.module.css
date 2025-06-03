@@ -1,57 +1,100 @@
-    .container {
-    min-height: 100vh;
-    padding: 1.5rem;
-    background: linear-gradient(to right, black, #7b0f17);
-    color: gold;
-    }
+.container {
+  min-height: 100vh;
+  padding: 0 1rem; /* deixa um padding horizontal */
+  background: linear-gradient(to right, black, #7b0f17);
+  color: gold;
+}
 
-    .sectionTitle {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    }
+.sliderWrapper {
+  width: 100vw;          /* largura total da viewport */
+  margin-left: -1rem;    /* negativo igual ao padding horizontal do container */
+  margin-right: -1rem;   /* para compensar o padding do container também */
+  overflow: hidden;
+}
 
-    .scrollContainer {
-    display: flex;
-    gap: 1rem;
-    overflow-x: auto;
-    padding-bottom: 8px;
+.sectionTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 2rem 0 1rem;
+}
 
-    scrollbar-width: thin;
-    scrollbar-color: transparent transparent;
-    }
+.scrollContainer {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 12px; /* espaço pra barra */
+  scrollbar-width: thin;
+  scrollbar-color: #c40f1b #111;
+  -webkit-overflow-scrolling: touch; /* suaviza o scroll no iOS */
+}
 
-    .scrollContainer::-webkit-scrollbar {
-    height: 6px;
-    background: transparent;
-    }
+.scrollContainer::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge: esconde scrollbar nativa */
+    height: 12px;  /* deixa a barra maior pra aparecer */
+  background: #111; /* cor de fundo da barra */
+}
 
-    .scrollContainer::-webkit-scrollbar-thumb {
-    background-color: #7b0f17;
-    border-radius: 3px;
-    transition: background-color 0.3s;
-    }
+/* Barra de scroll custom */
+.customScrollbar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: #111;
+  border-radius: 6px;
+}
 
-    .scrollContainer::-webkit-scrollbar-thumb:hover {
-    background-color: #a12123;
-    }
+.customScrollbarThumb {
+  height: 100%;
+  background-color: #c40f1b;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 50px; /* largura inicial */
+  transition: background-color 0.3s;
+}
 
-    .card {
-    min-width: 150px;
-    height: 220px;
-    background: white;
-    border-radius: 0.375rem;
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-    }
+.customScrollbarThumb:hover {
+  background-color: #cc2e31;
+}
 
-    .card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    }
+.card {
+  min-width: 150px;
+  /* altura maior para caber a imagem + título */
+  height: auto; /* ou altura fixa maior se quiser */
+  background: rgba(255, 255, 255, 0);
+  border-radius: 0.375rem;
+  overflow: visible; /* para não cortar o texto */
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+}
 
-    .card:hover {
-    transform: scale(1.05);
-    }
+.card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 0.375rem 0.375rem 0 0;
+  flex-shrink: 0;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.cardTitle {
+  color: gold;
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 0.5rem 0 1rem;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0);
+  text-decoration: none;
+}

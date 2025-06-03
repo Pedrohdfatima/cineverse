@@ -1,9 +1,17 @@
 .container {
   min-height: 100vh;
-  padding: 1.5rem;
+  padding: 0 1rem; /* deixa um padding horizontal */
   background: linear-gradient(to right, black, #7b0f17);
   color: gold;
 }
+
+.sliderWrapper {
+  width: 100vw;          /* largura total da viewport */
+  margin-left: -1rem;    /* negativo igual ao padding horizontal do container */
+  margin-right: -1rem;   /* para compensar o padding do container também */
+  overflow: hidden;
+}
+
 
 .sectionTitle {
   font-size: 1.75rem;

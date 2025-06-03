@@ -6,7 +6,6 @@ import styles from "../styles/header.module.css";
 export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
-  const rotaAtual = location.pathname;
   const [termo, setTermo] = useState("");
 
   const navLinks = [
@@ -18,7 +17,7 @@ export default function Header() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (termo.trim() !== "") {
+    if (termo.trim()) {
       navigate(`/busca?q=${encodeURIComponent(termo.trim())}`);
       setTermo("");
     }
@@ -26,21 +25,23 @@ export default function Header() {
 
   return (
     <header className={styles.header}>
-      <div className={styles.logoContainer}>
-        <Link to="/" className={styles.logoLink}>
-          <img src={logo} alt="CineVerse Logo" className={styles.logo} />
-          <span className={styles.siteName}>CineVerse</span>
-        </Link>
-      </div>
+      <Link to="/" className={styles.logoContainer}>
+        <img src={logo} alt="CineVerse Logo" className={styles.logo} />
+        <span className={styles.siteName}>CineVerse</span>
+      </Link>
 
       <nav className={styles.nav}>
-        {navLinks
-          .filter((link) => link.path !== rotaAtual)
-          .map((link) => (
-            <Link key={link.path} to={link.path} className={styles.navLink}>
-              {link.label}
-            </Link>
-          ))}
+        {navLinks.map((link) => (
+          <Link
+            key={link.path}
+            to={link.path}
+            className={`${styles.navLink} ${
+              location.pathname === link.path ? styles.active : ""
+            }`}
+          >
+            {link.label}
+          </Link>
+        ))}
       </nav>
 
       <form onSubmit={handleSubmit} className={styles.searchForm}>

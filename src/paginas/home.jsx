@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import BannerSlider from "../components/BannerSlider";
 import styles from "../styles/home.module.css";
 
 const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
@@ -56,6 +57,7 @@ export default function Home() {
             <img
               src={`https://image.tmdb.org/t/p/w300${item.poster_path}`}
               alt={item.title || item.name}
+              className={styles.poster}
             />
           </Link>
         ))}
@@ -63,12 +65,18 @@ export default function Home() {
     </>
   );
 
-  return (
-    <div className={styles.container}>
-      {renderSecao("Top 10 do Dia", topGeral)}
-      {renderSecao("Filmes Populares", filmesPopulares)}
-      {renderSecao("Séries Populares", seriesPopulares)}
-      {renderSecao("Melhores Avaliados", melhoresFilmes)}
+return (
+  <div className={styles.container}>
+    {/* Slider sem padding nas laterais */}
+    <div className={styles.sliderWrapper}>
+      <BannerSlider dados={topGeral} />
     </div>
-  );
+
+    {/* Conteúdo com padding normal */}
+    {renderSecao("Filmes Populares", filmesPopulares)}
+    {renderSecao("Séries Populares", seriesPopulares)}
+    {renderSecao("Melhores Avaliados", melhoresFilmes)}
+  </div>
+);
+
 }
