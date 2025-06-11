@@ -1,6 +1,8 @@
-import React from "react"; // Adicionado React para JSX funcionar corretamente
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import BannerSlider from "../components/BannerSlider";
 import HorizontalScroll from "../components/HorizontalScroll";
-import styles from "../styles/series.module.css";
+import styles from "../styles/FilmesSeries.module.css";
 
 // Gêneros de séries (baseado na TMDB)
 const GENRES = [
@@ -22,9 +24,33 @@ const GENRES = [
   { id: 37, name: "Faroeste" }, // Adicionado Faroeste para séries também
 ];
 
+const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
+const LANG = "pt-BR";
+
 export default function Series() {
+   const [bannerSeries, setBannerSeries] = useState([]);
+
+  useEffect(() => {
+    const fetchBannerSeries = async () => {
+      try {
+        const response = await axios.get("https://api.themoviedb.org/3/tv/popular", {
+          params: { api_key: API_KEY, language: LANG, page: 1 },
+        });
+        setBannerSeries(response.data.results);
+      } catch (error) {
+        console.error("Erro ao buscar séries para o banner:", error);
+      }
+    };
+    fetchBannerSeries();
+  }, []);
+
   return (
+    
     <div className={styles.container}>
+      <div className={styles.sliderWrapper}>
+        <BannerSlider dados={bannerSeries.slice(0, 5)} />
+      </div>
+      
       <HorizontalScroll
         title="Séries Populares"
         fetchUrl="https://api.themoviedb.org/3/tv/popular"
@@ -33,21 +59,6 @@ export default function Series() {
       <HorizontalScroll
         title="Séries Melhores Avaliadas"
         fetchUrl="https://api.themoviedb.org/3/tv/top_rated"
-        mediaType="tv"
-      />
-      <HorizontalScroll
-        title="Séries No Ar Agora"
-        fetchUrl="https://api.themoviedb.org/3/tv/on_the_air"
-        mediaType="tv"
-      />
-      <HorizontalScroll
-        title="Séries Estreando Hoje"
-        fetchUrl="https://api.themoviedb.org/3/tv/airing_today"
-        mediaType="tv"
-      />
-       <HorizontalScroll
-        title="Tendências da Semana (Séries)"
-        fetchUrl="https://api.themoviedb.org/3/trending/tv/week"
         mediaType="tv"
       />
 

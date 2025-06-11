@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import BannerSlider from "../components/BannerSlider";
-import { Link } from "react-router-dom";
+import HorizontalScroll from "../components/HorizontalScroll"; // <-- IMPORTAÇÃO ADICIONADA
 import styles from "../styles/home.module.css";
 
 const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
@@ -19,11 +19,10 @@ const categorias = [
 ];
 
 export default function Home() {
-  const [dadosCategorias, setDadosCategorias] = useState({});
   const [tendencias, setTendencias] = useState([]);
 
   useEffect(() => {
-    const fetchDados = async () => {
+    const fetchTendencias = async () => {
       try {
         const tendenciasRes = await axios.get(
           "https://api.themoviedb.org/3/trending/all/week",
@@ -32,75 +31,37 @@ export default function Home() {
           }
         );
         setTendencias(tendenciasRes.data.results);
-
-        const promises = categorias.map((cat) =>
-          axios.get("https://api.themoviedb.org/3/discover/movie", {
-            params: {
-              api_key: API_KEY,
-              language: LANG,
-              with_genres: cat.id,
-            },
-          })
-        );
-
-        const results = await Promise.all(promises);
-        const novosDados = {};
-        results.forEach((res, idx) => {
-          novosDados[categorias[idx].nome] = res.data.results;
-        });
-        setDadosCategorias(novosDados);
       } catch (error) {
-        console.error("Erro ao buscar dados:", error);
+        console.error("Erro ao buscar tendências:", error);
       }
     };
 
-    fetchDados();
+    fetchTendencias();
   }, []);
 
   return (
     <div className={styles.container}>
       <div className={styles.sliderWrapper}>
+        {/* O BannerSlider permanece o mesmo */}
         <BannerSlider dados={tendencias.slice(0, 5)} />
       </div>
 
-      <h2 className={styles.sectionTitle}>Tendências da Semana</h2>
-      <div className={styles.scrollContainer}>
-        {tendencias.map((item) => (
-          <Link
-            to={`/detalhes/${item.media_type || "movie"}/${item.id}`}
-            key={item.id}
-            className={styles.card}
-            title={item.title || item.name}
-          >
-            <img
-              src={`https://image.tmdb.org/t/p/w300${item.poster_path}`}
-              alt={item.title || item.name}
-            />
-            <p className={styles.cardTitle}>{item.title || item.name}</p>
-          </Link>
-        ))}
-      </div>
+      {/* Seção de Tendências agora usa HorizontalScroll */}
+      <HorizontalScroll
+        title="Tendências da Semana"
+        fetchUrl="https://api.themoviedb.org/3/trending/all/week"
+        mediaType="movie" // ou ajuste conforme necessário
+      />
 
+      {/* Seções de Categoria agora usam HorizontalScroll */}
       {categorias.map((cat) => (
-        <div key={cat.id} className={styles.section}>
-          <h2 className={styles.sectionTitle}>{cat.nome}</h2>
-          <div className={styles.scrollContainer}>
-            {(dadosCategorias[cat.nome] || []).map((filme) => (
-              <Link
-                to={`/detalhes/movie/${filme.id}`}
-                key={filme.id}
-                className={styles.card}
-                title={filme.title}
-              >
-                <img
-                  src={`https://image.tmdb.org/t/p/w300${filme.poster_path}`}
-                  alt={filme.title}
-                />
-                <p className={styles.cardTitle}>{filme.title}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
+        <HorizontalScroll
+          key={`movie-genre-${cat.id}`}
+          title={cat.nome}
+          fetchUrl="https://api.themoviedb.org/3/discover/movie"
+          params={{ with_genres: cat.id, sort_by: "popularity.desc" }}
+          mediaType="movie"
+        />
       ))}
     </div>
   );

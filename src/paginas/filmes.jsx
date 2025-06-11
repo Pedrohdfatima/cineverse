@@ -1,6 +1,12 @@
-import React from "react"; // Adicionado React para JSX funcionar corretamente
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import BannerSlider from "../components/BannerSlider";
 import HorizontalScroll from "../components/HorizontalScroll";
-import styles from "../styles/filmes.module.css";
+import styles from "../styles/FilmesSeries.module.css";
+
+const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
+const LANG = "pt-BR";
+
 
 // Gêneros de filmes (pode ser movido para um arquivo de constantes se usado em mais lugares)
 const GENRES = [
@@ -33,8 +39,28 @@ const GENRES = [
 // }
 
 export default function Filmes() {
+  const [bannerMovies, setBannerMovies] = useState([]);
+
+  useEffect(() => {
+    const fetchBannerMovies = async () => {
+      try {
+        const response = await axios.get("https://api.themoviedb.org/3/movie/popular", {
+          params: { api_key: API_KEY, language: LANG, page: 1 },
+        });
+        setBannerMovies(response.data.results);
+      } catch (error) {
+        console.error("Erro ao buscar filmes para o banner:", error);
+      }
+    };
+    fetchBannerMovies();
+  }, []);
+
   return (
     <div className={styles.container}>
+      <div className={styles.sliderWrapper}>
+        <BannerSlider dados={bannerMovies.slice(0, 5)} />
+      </div>
+
       <HorizontalScroll
         title="Filmes Populares"
         fetchUrl="https://api.themoviedb.org/3/movie/popular"
@@ -43,21 +69,6 @@ export default function Filmes() {
       <HorizontalScroll
         title="Melhores Avaliados"
         fetchUrl="https://api.themoviedb.org/3/movie/top_rated"
-        mediaType="movie"
-      />
-      <HorizontalScroll
-        title="Em Cartaz"
-        fetchUrl="https://api.themoviedb.org/3/movie/now_playing"
-        mediaType="movie"
-      />
-      <HorizontalScroll
-        title="Próximos Lançamentos"
-        fetchUrl="https://api.themoviedb.org/3/movie/upcoming"
-        mediaType="movie"
-      />
-      <HorizontalScroll
-        title="Tendências da Semana (Filmes)"
-        fetchUrl="https://api.themoviedb.org/3/trending/movie/week"
         mediaType="movie"
       />
 

@@ -6,12 +6,15 @@ import { useAuth } from "../hooks/useAuth";
 import { WatchLaterContext } from "../contexts/WatchLaterContext";
 import { FavoritesContext } from '../contexts/FavoritesContext';
 import { RatingsContext } from '../contexts/RatingsContext';
+import HorizontalScroll from "../components/HorizontalScroll"; // <-- IMPORTAR O COMPONENTE
 
 export default function Detalhes() {
   const { tipo, id } = useParams();
   const navigate = useNavigate();
   const [dados, setDados] = useState(null);
   const [providers, setProviders] = useState(null);
+  const [recommendations, setRecommendations] = useState([]); // <-- NOVO ESTADO
+
   const { usuario } = useAuth();
   const { addToWatchLater, removeFromWatchLater, isWatchLater } = useContext(WatchLaterContext);
   const { addToFavorites, removeFromFavorites, isFavorite } = useContext(FavoritesContext);
@@ -22,6 +25,7 @@ export default function Detalhes() {
  
   const estaSalvo = isWatchLater(dados?.id);
 
+  // ... (mantenha o resto das suas funções handleWatchLater, handleFavorite, etc.)
   const handleWatchLater = () => {
     if (!dados) return;
 
@@ -51,10 +55,11 @@ export default function Detalhes() {
     rateItem(item, rating);
  };
 
+
   useEffect(() => {
     const buscarDetalhes = async () => {
       try {
-        const [detalhesRes, providersRes] = await Promise.all([
+        const [detalhesRes, providersRes, recommendationsRes] = await Promise.all([ // <-- ADICIONADO recommendationsRes
           axios.get(`https://api.themoviedb.org/3/${tipo}/${id}`, {
             params: {
               api_key: process.env.REACT_APP_TMDB_API_KEY,
@@ -70,10 +75,18 @@ export default function Detalhes() {
               },
             }
           ),
+          // NOVA CHAMADA DE API PARA RECOMENDAÇÕES
+          axios.get(`https://api.themoviedb.org/3/${tipo}/${id}/recommendations`, {
+            params: {
+              api_key: process.env.REACT_APP_TMDB_API_KEY,
+              language: "pt-BR",
+            },
+          }),
         ]);
 
         setDados(detalhesRes.data);
         setProviders(providersRes.data.results?.BR || null);
+        setRecommendations(recommendationsRes.data.results); // <-- SALVA AS RECOMENDAÇÕES NO ESTADO
       } catch (err) {
         console.error("Erro ao buscar detalhes:", err);
       }
@@ -90,7 +103,8 @@ export default function Detalhes() {
 
   return (
     <div className={styles.container}>
-      <button onClick={() => navigate(-1)} className={styles.backButton}>
+      {/* ... (todo o seu JSX existente para a parte de cima da página) ... */}
+        <button onClick={() => navigate(-1)} className={styles.backButton}>
         ⬅ Voltar
       </button>
 
@@ -127,7 +141,7 @@ export default function Detalhes() {
                   className={star <= avaliacaoUsuario ? styles.starFilled : styles.star}
                   onClick={() => handleRating(star)}
                 >
-                  &#9733;
+                  ★
                 </span>
               ))}
             </div>
@@ -268,6 +282,17 @@ export default function Detalhes() {
           </p>
         )}
       </div>
+
+
+      {/* NOVA SEÇÃO DE RECOMENDAÇÕES */}
+      <div style={{marginTop: '3rem'}}>
+        <HorizontalScroll
+          title="Recomendações"
+          initialData={recommendations}
+          mediaType={tipo}
+        />
+      </div>
+
     </div>
   );
 }
