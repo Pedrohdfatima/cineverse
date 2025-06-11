@@ -1,68 +1,58 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams, Link } from "react-router-dom";
 import axios from "axios";
-import { Link } from "react-router-dom";
 import styles from "../styles/busca.module.css";
 
 export default function Busca() {
   const [resultados, setResultados] = useState([]);
-  const [termo, setTermo] = useState("");
   const [loading, setLoading] = useState(false);
+  const [searchParams] = useSearchParams();
 
-  const buscarTudo = async () => {
-    if (!termo.trim()) {
-      setResultados([]);
-      return;
-    }
+  const termo = searchParams.get("q");
 
-    setLoading(true);
-    try {
-      const res = await axios.get(
-        "https://api.themoviedb.org/3/search/multi",
-        {
-          params: {
-            api_key: process.env.REACT_APP_TMDB_API_KEY,
-            language: "pt-BR",
-            query: termo,
-            include_adult: false,
-          },
-        }
-      );
-      setResultados(res.data.results);
-    } catch (err) {
-      console.error("Erro na busca:", err);
-      setResultados([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    const buscarTudo = async () => {
+      if (!termo) {
+        setResultados([]);
+        return;
+      }
 
-  // Separar resultados em arrays de filmes e séries
+      setLoading(true);
+      try {
+        const res = await axios.get(
+          "https://api.themoviedb.org/3/search/multi",
+          {
+            params: {
+              api_key: process.env.REACT_APP_TMDB_API_KEY,
+              language: "pt-BR",
+              query: termo,
+              include_adult: false,
+            },
+          }
+        );
+        setResultados(res.data.results);
+      } catch (err) {
+        console.error("Erro na busca:", err);
+        setResultados([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    buscarTudo();
+  }, [termo]);
+
   const filmes = resultados.filter((item) => item.media_type === "movie");
   const series = resultados.filter((item) => item.media_type === "tv");
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.sectionTitle}>Buscar Filmes e Séries</h2>
-      <div className={styles.searchBox}>
-        <input
-          type="text"
-          value={termo}
-          onChange={(e) => setTermo(e.target.value)}
-          placeholder="Digite o nome do filme ou série"
-          className={styles.searchInput}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") buscarTudo();
-          }}
-        />
-        <button onClick={buscarTudo} className={styles.searchButton}>
-          Buscar
-        </button>
-      </div>
+      <h2 className={styles.sectionTitle}>Resultados para: "{termo}"</h2>
 
       {loading && <p>Carregando...</p>}
 
-      {!loading && resultados.length === 0 && termo.trim() !== "" && (
-        <p>Nenhum resultado encontrado.</p>
+      {!loading && resultados.length === 0 && termo && (
+        <p>Nenhum resultado encontrado para "{termo}".</p>
       )}
 
       {filmes.length > 0 && (

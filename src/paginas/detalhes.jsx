@@ -1,13 +1,55 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "../styles/detalhes.module.css";
+import { useAuth } from "../hooks/useAuth";
+import { WatchLaterContext } from "../contexts/WatchLaterContext";
+import { FavoritesContext } from '../contexts/FavoritesContext';
+import { RatingsContext } from '../contexts/RatingsContext';
 
 export default function Detalhes() {
   const { tipo, id } = useParams();
   const navigate = useNavigate();
   const [dados, setDados] = useState(null);
   const [providers, setProviders] = useState(null);
+  const { usuario } = useAuth();
+  const { addToWatchLater, removeFromWatchLater, isWatchLater } = useContext(WatchLaterContext);
+  const { addToFavorites, removeFromFavorites, isFavorite } = useContext(FavoritesContext);
+  const { rateItem, getRating } = useContext(RatingsContext);
+  const ehFavorito = isFavorite(dados?.id);
+  const avaliacaoUsuario = getRating(dados?.id);
+
+ 
+  const estaSalvo = isWatchLater(dados?.id);
+
+  const handleWatchLater = () => {
+    if (!dados) return;
+
+    const itemParaSalvar = {
+      id: dados.id,
+      title: dados.title || dados.name,
+      poster_path: dados.poster_path,
+      tipo: tipo,
+    };
+
+    if (estaSalvo) {
+      removeFromWatchLater(dados.id);
+    } else {
+      addToWatchLater(itemParaSalvar);
+    }
+  };
+
+   const handleFavorite = () => {
+    if (!dados) return;
+    const item = { id: dados.id, title: dados.title || dados.name, poster_path: dados.poster_path, tipo: tipo };
+    ehFavorito ? removeFromFavorites(dados.id) : addToFavorites(item);
+  };
+
+  const handleRating = (rating) => {
+    if (!dados) return;
+    const item = { id: dados.id, title: dados.title || dados.name, poster_path: dados.poster_path, tipo: tipo, runtime: dados.runtime, genres: dados.genres };
+    rateItem(item, rating);
+ };
 
   useEffect(() => {
     const buscarDetalhes = async () => {
@@ -59,9 +101,38 @@ export default function Detalhes() {
           className={styles.poster}
         />
 
+      
+
         <div className={styles.info}>
           <h1 className={styles.title}>{dados.title || dados.name}</h1>
 
+             {usuario && (
+              <div className={styles.userActions}>
+            <button onClick={handleWatchLater} className={styles.watchLaterButton}>
+              {estaSalvo ? 'Remover da Lista' : 'Salvar para Depois'}
+            </button>
+                <button onClick={handleFavorite} className={styles.actionButton}>
+              {ehFavorito ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos'}
+            </button>
+          </div>
+        )}
+        
+           {usuario && (
+          <div className={styles.ratingSection}>
+            <h3>Sua Avaliação:</h3>
+            <div className={styles.stars}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <span 
+                  key={star} 
+                  className={star <= avaliacaoUsuario ? styles.starFilled : styles.star}
+                  onClick={() => handleRating(star)}
+                >
+                  &#9733;
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
           <p className={styles.overview}>{dados.overview}</p>
 
           {dados.genres && (

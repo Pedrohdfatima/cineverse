@@ -1,0 +1,158 @@
+.container {
+  min-height: 100vh;
+  padding: 1.5rem;
+  background: linear-gradient(to right, black, #7b0f17);
+  color: white;
+}
+
+.profileHeader {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.profileHeader h1 {
+  color: gold;
+  margin: 0;
+  font-size: 2rem;
+}
+
+.profileHeader p {
+  color: #ccc;
+  font-size: 1.1rem;
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: gold;
+  border-bottom: 2px solid #7b0f17;
+  padding-bottom: 0.5rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card img {
+  width: 100%;
+  display: block;
+}
+
+.cardOverlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.card:hover .cardOverlay {
+    opacity: 1;
+}
+
+
+.removeButton {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: rgba(229, 9, 20, 0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.removeButton:hover {
+  background-color: #e50914;
+}
+
+.ideas_list {
+    list-style-type: '🎬';
+    padding-left: 2rem;
+}
+
+.ideas_list li {
+    padding-left: 1rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+}
+
+.editButton {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 8px 16px;
+    background-color: #555;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.editButton:hover {
+    background-color: #e50914;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.statCard {
+    background-color: #222;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.statCard h3 {
+    color: gold;
+    font-size: 2rem;
+    margin: 0;
+}
+
+.statCard p {
+    color: #ccc;
+    margin: 0;
+    margin-top: 0.5rem;
+}
+
+.cardOverlay p {
+  font-size: 0.9rem;
+}

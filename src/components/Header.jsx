@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../img/logo.png";
+import perfil from "../img/perfil.png"
 import styles from "../styles/header.module.css";
 
 export default function Header() {
@@ -15,11 +16,14 @@ export default function Header() {
     { path: "/sobre", label: "Sobre Nós" },
   ];
 
-  const handleSubmit = (e) => {
+ const handleSubmit = (e) => {
     e.preventDefault();
     if (termo.trim()) {
       navigate(`/busca?q=${encodeURIComponent(termo.trim())}`);
-      setTermo("");
+      // Limpa o termo apenas se não estiver na página de busca
+      if (location.pathname !== "/busca") {
+        setTermo("");
+      }
     }
   };
 
@@ -53,6 +57,11 @@ export default function Header() {
           className={styles.searchInput}
         />
       </form>
+
+
+        <Link to="/Perfil" className={styles.logoContainer}>
+        <img src={perfil} alt="PerfilLogo" className={styles.perfil} />
+      </Link>
     </header>
   );
 }
