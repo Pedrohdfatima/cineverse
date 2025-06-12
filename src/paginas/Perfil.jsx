@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Importar useNavigate
 import { useAuth } from '../hooks/useAuth';
 import { WatchLaterContext } from '../contexts/WatchLaterContext';
 import { FavoritesContext } from '../contexts/FavoritesContext';
@@ -7,11 +7,13 @@ import { RatingsContext } from '../contexts/RatingsContext';
 import styles from '../styles/perfil.module.css';
 
 export default function Perfil() {
-  const { usuario } = useAuth();
+  const { usuario, logout } = useAuth(); // Obter a função logout
+  const navigate = useNavigate(); // Hook para navegação
   const { list: watchLaterList } = useContext(WatchLaterContext);
   const { favorites } = useContext(FavoritesContext);
   const { ratings } = useContext(RatingsContext);
 
+  // Sua função de stats continua a mesma
   const stats = useMemo(() => {
     const todosItens = [...watchLaterList, ...favorites, ...ratings];
     const totalHoras = todosItens.reduce((acc, item) => acc + (item.runtime || 0), 0) / 60;
@@ -33,12 +35,20 @@ export default function Perfil() {
     }
   }, [watchLaterList, favorites, ratings]);
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login'); // Redirecionar após o logout
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.profileHeader}>
         <h1>Perfil de {usuario?.nome}</h1>
         <p>Email: {usuario?.email}</p>
-        <Link to="/perfil/editar" className={styles.editButton}>Editar Perfil</Link>
+        <div className={styles.buttonContainer}>
+          <Link to="/perfil/editar" className={styles.editButton}>Editar Perfil</Link>
+          <button onClick={handleLogout} className={styles.logoutButton}>Sair</button>
+        </div>
       </div>
 
       <div className={styles.section}>

@@ -41,8 +41,8 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/cadastro" element={<Cadastro />} />
                     <Route path="/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
-                    <Route path="/filmes" element={<ProtectedRoute><Filmes /></ProtectedRoute>} />
-                    <Route path="/series" element={<ProtectedRoute><Series /></ProtectedRoute>} />
+                    <Route path="/filmes" element={<Filmes />} />
+                    <Route path="/series" element={<Series />} />
                     <Route path="/sobre" element={<Sobre />} />
                     <Route path="/detalhes/:tipo/:id" element={<Detalhes />} />
                     <Route path="/busca" element={<Busca />} />
