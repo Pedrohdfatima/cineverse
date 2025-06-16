@@ -9,7 +9,6 @@ export function WatchLaterProvider({ children }) {
   const [list, setList] = useState([]);
   const { usuario } = useContext(AuthContext);
 
-  // Efeito para carregar a lista do Firestore quando o usuário loga
   useEffect(() => {
     if (usuario) {
       const fetchWatchLater = async () => {
@@ -26,21 +25,28 @@ export function WatchLaterProvider({ children }) {
 
   const addToWatchLater = async (item) => {
     if (!usuario) return;
+    setList((prev) => [...prev, item]); // Otimista
+
     try {
       await setDoc(doc(db, "users", usuario.uid, "watchLater", String(item.id)), item);
-      setList((prev) => [...prev, item]);
     } catch (e) {
       console.error("Erro ao adicionar à lista: ", e);
+      setList((prev) => prev.filter((i) => i.id !== item.id)); // Rollback
+      alert("Não foi possível adicionar à lista. Tente novamente.");
     }
   };
 
   const removeFromWatchLater = async (itemId) => {
     if (!usuario) return;
+    const originalList = [...list];
+    setList((prev) => prev.filter((item) => item.id !== itemId)); // Otimista
+
     try {
       await deleteDoc(doc(db, "users", usuario.uid, "watchLater", String(itemId)));
-      setList((prev) => prev.filter((item) => item.id !== itemId));
     } catch (e) {
       console.error("Erro ao remover da lista: ", e);
+      setList(originalList); // Rollback
+      alert("Não foi possível remover da lista. Tente novamente.");
     }
   };
 

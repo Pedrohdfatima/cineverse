@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { AuthContext } from './AuthContext';
-import { db } from '../firebase'; // Importa a instância do Firestore
+import { db } from '../firebase';
 import { collection, doc, getDocs, setDoc, deleteDoc } from 'firebase/firestore';
 
 export const FavoritesContext = createContext();
@@ -9,7 +9,6 @@ export function FavoritesProvider({ children }) {
   const [favorites, setFavorites] = useState([]);
   const { usuario } = useContext(AuthContext);
 
-  // Efeito para carregar os favoritos do Firestore quando o usuário loga
   useEffect(() => {
     if (usuario) {
       const fetchFavorites = async () => {
@@ -20,29 +19,42 @@ export function FavoritesProvider({ children }) {
       };
       fetchFavorites();
     } else {
-      // Limpa os favoritos se o usuário deslogar
       setFavorites([]);
     }
   }, [usuario]);
 
   const addToFavorites = async (item) => {
     if (!usuario) return;
+    
+    // Atualização Otimista: Muda a UI primeiro
+    setFavorites(prev => [...prev, item]);
+
     try {
-      // Define um documento com o ID do filme/série
+      // Tenta salvar no banco de dados em segundo plano
       await setDoc(doc(db, "users", usuario.uid, "favorites", String(item.id)), item);
-      setFavorites(prev => [...prev, item]);
     } catch (e) {
       console.error("Erro ao adicionar favorito: ", e);
+      // Rollback: Se der erro, remove o item que foi adicionado na UI
+      setFavorites(prev => prev.filter(fav => fav.id !== item.id));
+      alert("Não foi possível salvar o favorito. Tente novamente.");
     }
   };
 
   const removeFromFavorites = async (itemId) => {
     if (!usuario) return;
+
+    const originalFavorites = [...favorites]; // Salva o estado original
+    // Atualização Otimista: Remove da UI primeiro
+    setFavorites(prev => prev.filter(item => item.id !== itemId));
+    
     try {
+      // Tenta deletar do banco de dados em segundo plano
       await deleteDoc(doc(db, "users", usuario.uid, "favorites", String(itemId)));
-      setFavorites(prev => prev.filter(item => item.id !== itemId));
     } catch (e) {
       console.error("Erro ao remover favorito: ", e);
+      // Rollback: Se der erro, restaura a lista original
+      setFavorites(originalFavorites);
+      alert("Não foi possível remover o favorito. Tente novamente.");
     }
   };
 

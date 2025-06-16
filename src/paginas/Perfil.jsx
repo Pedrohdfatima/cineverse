@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Importar useNavigate
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { WatchLaterContext } from '../contexts/WatchLaterContext';
 import { FavoritesContext } from '../contexts/FavoritesContext';
@@ -7,15 +7,15 @@ import { RatingsContext } from '../contexts/RatingsContext';
 import styles from '../styles/perfil.module.css';
 
 export default function Perfil() {
-  const { usuario, logout } = useAuth(); // Obter a função logout
-  const navigate = useNavigate(); // Hook para navegação
+  const { usuario, logout } = useAuth();
+  const navigate = useNavigate();
   const { list: watchLaterList } = useContext(WatchLaterContext);
   const { favorites } = useContext(FavoritesContext);
   const { ratings } = useContext(RatingsContext);
 
-  // Sua função de stats continua a mesma
   const stats = useMemo(() => {
-    const todosItens = [...watchLaterList, ...favorites, ...ratings];
+    // A lógica das estatísticas que usa o watchLaterList já está correta
+    const todosItens = [...watchLaterList, ...favorites, ...ratings.map(r => r.item)];
     const totalHoras = todosItens.reduce((acc, item) => acc + (item.runtime || 0), 0) / 60;
     
     const generos = todosItens.flatMap(item => item.genres || []).map(g => g.name);
@@ -37,7 +37,7 @@ export default function Perfil() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login'); // Redirecionar após o logout
+    navigate('/login');
   };
 
   return (
@@ -62,6 +62,21 @@ export default function Perfil() {
         </div>
       </div>
       
+      {/* --- SEÇÃO "PARA ASSISTIR DEPOIS" ADICIONADA AQUI --- */}
+      <div className={styles.section}>
+        <h2 className={styles.sectionTitle}>Para Assistir Depois</h2>
+        {watchLaterList.length > 0 ? (
+          <div className={styles.grid}>
+            {watchLaterList.map((item) => (
+              <Link key={`watch-${item.id}`} to={`/detalhes/${item.tipo}/${item.id}`} className={styles.card}>
+                <img src={`https://image.tmdb.org/t/p/w300${item.poster_path}`} alt={item.title || item.name}/>
+                <div className={styles.cardOverlay}><p>{item.title || item.name}</p></div>
+              </Link>
+            ))}
+          </div>
+        ) : <p>Sua lista para assistir depois está vazia.</p>}
+      </div>
+      
       <div className={styles.section}>
         <h2 className={styles.sectionTitle}>Favoritos</h2>
         {favorites.length > 0 ? (
@@ -80,10 +95,10 @@ export default function Perfil() {
         <h2 className={styles.sectionTitle}>Conteúdo Avaliado</h2>
         {ratings.length > 0 ? (
           <div className={styles.grid}>
-            {ratings.map((item) => (
-              <Link key={`rat-${item.id}`} to={`/detalhes/${item.tipo}/${item.id}`} className={styles.card}>
-                <img src={`https://image.tmdb.org/t/p/w300${item.poster_path}`} alt={item.title || item.name}/>
-                <div className={styles.cardOverlay}><p>Sua nota: {item.rating} ★</p></div>
+            {ratings.map((ratedItem) => (
+              <Link key={`rat-${ratedItem.id}`} to={`/detalhes/${ratedItem.tipo}/${ratedItem.id}`} className={styles.card}>
+                <img src={`https://image.tmdb.org/t/p/w300${ratedItem.poster_path}`} alt={ratedItem.title || ratedItem.name}/>
+                <div className={styles.cardOverlay}><p>Sua nota: {ratedItem.rating} ★</p></div>
               </Link>
             ))}
           </div>

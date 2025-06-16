@@ -9,7 +9,6 @@ export function RatingsProvider({ children }) {
   const [ratings, setRatings] = useState([]);
   const { usuario } = useContext(AuthContext);
 
-  // Efeito para carregar as avaliações do Firestore quando o usuário loga
   useEffect(() => {
     if (usuario) {
       const fetchRatings = async () => {
@@ -26,23 +25,28 @@ export function RatingsProvider({ children }) {
 
   const rateItem = async (item, rating) => {
     if (!usuario) return;
-    try {
-      const itemToRate = { ...item, rating };
-      await setDoc(doc(db, "users", usuario.uid, "ratings", String(item.id)), itemToRate);
+    const originalRatings = [...ratings];
+    const itemToRate = { ...item, rating };
 
-      setRatings((prev) => {
-        const existingRatingIndex = prev.findIndex((r) => r.id === item.id);
-        let newList;
-        if (existingRatingIndex > -1) {
-          newList = [...prev];
-          newList[existingRatingIndex].rating = rating;
-        } else {
-          newList = [...prev, itemToRate];
-        }
-        return newList;
-      });
+    // Atualização Otimista
+    setRatings((prev) => {
+      const existingRatingIndex = prev.findIndex((r) => r.id === item.id);
+      let newList;
+      if (existingRatingIndex > -1) {
+        newList = [...prev];
+        newList[existingRatingIndex].rating = rating;
+      } else {
+        newList = [...prev, itemToRate];
+      }
+      return newList;
+    });
+
+    try {
+      await setDoc(doc(db, "users", usuario.uid, "ratings", String(item.id)), itemToRate);
     } catch (e) {
       console.error("Erro ao avaliar item: ", e);
+      setRatings(originalRatings); // Rollback
+      alert("Não foi possível salvar sua avaliação. Tente novamente.");
     }
   };
 
