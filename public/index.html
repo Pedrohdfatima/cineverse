@@ -3,21 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    
     <title>Cineverse</title>
-    
-    <!-- Favicon personalizado -->
-    <link rel="icon" href="%PUBLIC_URL%/logo.png" type="image/png" />
 
-    <!-- Meta tags adicionais (opcional) -->
+    <script type="text/javascript">
+      (function() {
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect != window.location.pathname) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
+    <link rel="icon" href="%PUBLIC_URL%/logo.png" type="image/png" />
     <meta name="description" content="Cineverse - Seu portal de filmes e séries" />
     <meta name="theme-color" content="#7b0f17" />
-
-    <!-- Outras tags que seu projeto usar -->
   </head>
   <body>
     <noscript>Você precisa ativar o JavaScript para rodar este app.</noscript>
     <div id="root"></div>
-    <!-- O React vai injetar aqui seu app -->
   </body>
 </html>

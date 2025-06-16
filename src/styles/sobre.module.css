@@ -1,18 +1,54 @@
 .container {
   min-height: 100vh;
-  padding: 1.5rem;
+  padding: 2rem 4rem; /* Aumentado o padding para mais espaço */
   background: linear-gradient(to right, black, #7b0f17);
-  color: gold;
+  color: #f0f0f0; /* Um branco suave para melhor leitura */
+  max-width: 800px; /* Largura máxima para o texto não ficar muito longo */
+  margin: 0 auto; /* Centraliza o container */
 }
 
 .title {
+  font-size: 2.5rem; /* Título maior */
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: gold;
+  text-align: center; /* Centraliza o título principal */
+}
+
+.subtitle {
   font-size: 1.75rem;
   font-weight: 700;
+  margin-top: 2.5rem; /* Mais espaço acima do subtítulo */
   margin-bottom: 1rem;
+  color: gold;
+  border-bottom: 2px solid #c40f1b; /* Linha de separação */
+  padding-bottom: 0.5rem;
 }
 
 .text {
-  max-width: 40rem;
+  max-width: 45rem;
   color: white;
-  line-height: 1.5;
+  line-height: 1.6; /* Melhora a legibilidade */
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.teamList {
+  list-style: none;
+  padding: 0;
+  font-size: 1.2rem;
+}
+
+.teamList li {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 0.5rem;
+  border-radius: 5px;
+  border-left: 4px solid #c40f1b;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.teamList li:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
 }

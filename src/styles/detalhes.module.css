@@ -205,3 +205,106 @@
   transition: background-color 0.3s;
   /* Remove margin-top para alinhar com o novo container */
 }
+
+.seasonsSection {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.seasonSelector {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #222;
+  color: white;
+  border: 1px solid #555;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+}
+
+.episodeList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 500px; /* Altura máxima para a lista */
+  overflow-y: auto; /* Adiciona scroll se a lista for longa */
+  scrollbar-width: thin;
+  scrollbar-color: #c40f1b #111;
+}
+
+.episodeList::-webkit-scrollbar {
+  width: 8px;
+}
+.episodeList::-webkit-scrollbar-thumb {
+  background-color: #c40f1b;
+  border-radius: 4px;
+}
+
+.episodeItem {
+  display: flex;
+  gap: 1.5rem;
+  background-color: #1c1c1c;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  padding: 1rem;
+}
+
+.episodeImage {
+  width: 200px;
+  height: 112px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border-radius: 4px;
+}
+
+.episodeInfo {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.episodeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.episodeTitle {
+  margin: 0;
+  font-size: 1.2rem;
+  color: gold;
+}
+
+.episodeOverview {
+  margin: 0;
+  color: #ccc;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+.playButton {
+  background-color: #e50914;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.playButton:hover {
+  transform: scale(1.1);
+}
