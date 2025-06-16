@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Cineverse - Redirecionando...</title>
+    <script type="text/javascript">
+      // Pega o caminho da URL que o usuário tentou acessar, menos o nome do repositório.
+      // Isso funciona para o GitHub Pages que hospeda em subdiretórios.
+      var path = window.location.pathname.split('/').slice(2).join('/');
+      
+      // Armazena o caminho corrigido no sessionStorage.
+      // O script no index.html vai ler isso para saber qual rota interna mostrar.
+      sessionStorage.redirect = path;
+
+      // Redireciona para a página principal da aplicação no GitHub Pages.
+      // O replace() é usado para não adicionar a URL 404 ao histórico do navegador.
+      window.location.replace(window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : '') + '/cineverse/');
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
