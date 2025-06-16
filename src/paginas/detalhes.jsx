@@ -6,42 +6,52 @@ import { useAuth } from "../hooks/useAuth";
 import { WatchLaterContext } from "../contexts/WatchLaterContext";
 import { FavoritesContext } from '../contexts/FavoritesContext';
 import { RatingsContext } from '../contexts/RatingsContext';
-import { HistoryContext } from "../contexts/HistoryContext";
 import HorizontalScroll from "../components/HorizontalScroll";
 
 export default function Detalhes() {
   const { tipo, id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation(); // Necessário para passar o estado na navegação
+
+  // Estados do componente
   const [dados, setDados] = useState(null);
   const [providers, setProviders] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
-  
   const [selectedSeason, setSelectedSeason] = useState(null);
   const [episodes, setEpisodes] = useState([]);
   const [loadingEpisodes, setLoadingEpisodes] = useState(false);
 
+  // Contextos
   const { usuario } = useAuth();
   const { addToWatchLater, removeFromWatchLater, isWatchLater } = useContext(WatchLaterContext);
   const { addToFavorites, removeFromFavorites, isFavorite } = useContext(FavoritesContext);
   const { rateItem, getRating } = useContext(RatingsContext);
-  const { addToHistory } = useContext(HistoryContext);
 
+  // Variáveis derivadas do estado
   const ehFavorito = dados ? isFavorite(dados.id) : false;
   const avaliacaoUsuario = dados ? getRating(dados.id) : 0;
   const estaSalvo = dados ? isWatchLater(dados.id) : false;
 
-  const handleWatchLater = () => { if (!dados) return; const item = { id: dados.id, title: dados.title || dados.name, poster_path: dados.poster_path, tipo: tipo }; estaSalvo ? removeFromWatchLater(dados.id) : addToWatchLater(item); };
-  const handleFavorite = () => { if (!dados) return; const item = { id: dados.id, title: dados.title || dados.name, poster_path: dados.poster_path, tipo: tipo }; ehFavorito ? removeFromFavorites(dados.id) : addToFavorites(item); };
-  const handleRating = (rating) => { if (!dados) return; const item = { id: dados.id, title: dados.title || dados.name, poster_path: dados.poster_path, tipo: tipo, runtime: dados.runtime, genres: dados.genres }; rateItem(item, rating); };
-  
-  const handleAssistir = (path) => {
-    if (dados) {
-      const historyItem = { id: dados.id, title: dados.title || dados.name, poster_path: dados.poster_path, tipo: tipo, media_type: tipo };
-      addToHistory(historyItem);
-    }
-    navigate(path);
+  // Funções de manipulação de eventos
+  const handleWatchLater = () => {
+    if (!dados) return;
+    const item = { id: dados.id, title: dados.title || dados.name, poster_path: dados.poster_path, tipo: tipo };
+    estaSalvo ? removeFromWatchLater(dados.id) : addToWatchLater(item);
   };
 
+  const handleFavorite = () => {
+    if (!dados) return;
+    const item = { id: dados.id, title: dados.title || dados.name, poster_path: dados.poster_path, tipo: tipo };
+    ehFavorito ? removeFromFavorites(dados.id) : addToFavorites(item);
+  };
+
+  const handleRating = (rating) => {
+    if (!dados) return;
+    const item = { id: dados.id, title: dados.title || dados.name, poster_path: dados.poster_path, tipo: tipo, runtime: dados.runtime, genres: dados.genres };
+    rateItem(item, rating);
+  };
+
+  // Efeito para buscar os dados principais da página
   useEffect(() => {
     setDados(null);
     setRecommendations([]);
@@ -73,6 +83,7 @@ export default function Detalhes() {
     buscarDetalhes();
   }, [tipo, id]);
 
+  // Efeito para buscar os episódios de uma temporada específica
   useEffect(() => {
     if (tipo === 'tv' && selectedSeason !== null) {
       setLoadingEpisodes(true);
@@ -117,7 +128,7 @@ export default function Detalhes() {
           
           <div className={styles.userActions}>
             {tipo === 'movie' && (
-              <button onClick={() => handleAssistir(`/assistir/${tipo}/${dados.id}`)} className={styles.watchButton}>
+              <button onClick={() => navigate(`/assistir/${tipo}/${dados.id}`, { state: { item: dados } })} className={styles.watchButton}>
                 ▶ Assistir Agora
               </button>
             )}
@@ -179,7 +190,7 @@ export default function Detalhes() {
                       <h3 className={styles.episodeTitle}>T{selectedSeason}:E{ep.episode_number} - {ep.name}</h3>
                       <button 
                         className={styles.playButton} 
-                        onClick={() => handleAssistir(`/assistir/tv/${id}/${selectedSeason}/${ep.episode_number}`)}
+                        onClick={() => navigate(`/assistir/tv/${id}/${selectedSeason}/${ep.episode_number}`, { state: { item: dados } })}
                         aria-label={`Assistir episódio ${ep.episode_number}`}
                       >
                         ▶
