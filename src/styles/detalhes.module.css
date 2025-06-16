@@ -166,3 +166,42 @@
 .starFilled {
   color: gold;
 }
+
+/* ... Adicione ao final do arquivo ... */
+
+.userActions {
+  display: flex;
+  flex-wrap: wrap; /* Garante que os botões se ajustem em telas menores */
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.watchButton {
+  background-color: #e50914;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+  font-size: 1.1rem; /* Um pouco maior para destaque */
+  order: -1; /* Coloca o botão "Assistir" como o primeiro */
+}
+
+.watchButton:hover {
+  background-color: #f40612;
+}
+
+.watchLaterButton, .actionButton {
+  background-color: #555;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+  /* Remove margin-top para alinhar com o novo container */
+}

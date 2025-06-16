@@ -16,6 +16,8 @@ import Login from "./paginas/Login";
 import Cadastro from "./paginas/Cadastro";
 import Perfil from "./paginas/Perfil"; // Importe a página de Perfil
 import EditarPerfil from "./paginas/EditarPerfil"; // Importe a nova página
+import Assistir from "./paginas/Assistir";
+
 
 import Header from "./components/Header";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -49,6 +51,9 @@ function App() {
                     <Route path="/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
                     <Route path="/perfil/editar" element={<ProtectedRoute><EditarPerfil /></ProtectedRoute>} />
                     <Route path="*" element={<Navigate to="/" />} />
+                    <Route path="/assistir/:tipo/:id" element={<Assistir />} />
+                    <Route path="/assistir/:tipo/:id/:season/:episode" element={<Assistir />} />
+                    
                   </Routes>
                 </main>
             </Router>

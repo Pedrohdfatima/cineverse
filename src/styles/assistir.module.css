@@ -1,0 +1,52 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh; /* Ocupa a tela inteira */
+  background-color: #000;
+  overflow: hidden; /* Previne barras de rolagem indesejadas */
+}
+
+.header {
+  padding: 1rem;
+  flex-shrink: 0; /* Impede que o header encolha */
+}
+
+.backButton {
+  background: #333;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.backButton:hover {
+  background: #555;
+}
+
+.playerWrapper {
+  flex-grow: 1; /* Faz o container do player ocupar o espaço restante */
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.player {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.episodeNote {
+    text-align: center;
+    padding: 1rem;
+    color: #888;
+    flex-shrink: 0;
+}
+
+.episodeNote p {
+    margin: 0.25rem 0;
+}
