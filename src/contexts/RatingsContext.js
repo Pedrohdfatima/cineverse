@@ -1,5 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { AuthContext } from './AuthContext';
+import { db } from '../firebase';
+import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
 
 export const RatingsContext = createContext();
 
@@ -7,38 +9,41 @@ export function RatingsProvider({ children }) {
   const [ratings, setRatings] = useState([]);
   const { usuario } = useContext(AuthContext);
 
-  const getStorageKey = () => {
-    if (!usuario) return null;
-    return `ratings_${usuario.email}`;
-  };
-
+  // Efeito para carregar as avaliações do Firestore quando o usuário loga
   useEffect(() => {
     if (usuario) {
-      const storageKey = getStorageKey();
-      const storedRatings = JSON.parse(localStorage.getItem(storageKey)) || [];
-      setRatings(storedRatings);
+      const fetchRatings = async () => {
+        const ratingsCol = collection(db, "users", usuario.uid, "ratings");
+        const ratingsSnapshot = await getDocs(ratingsCol);
+        const userRatings = ratingsSnapshot.docs.map(doc => doc.data());
+        setRatings(userRatings);
+      };
+      fetchRatings();
     } else {
       setRatings([]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usuario]);
 
-  const rateItem = (item, rating) => {
-    const storageKey = getStorageKey();
-    if (!storageKey) return;
+  const rateItem = async (item, rating) => {
+    if (!usuario) return;
+    try {
+      const itemToRate = { ...item, rating };
+      await setDoc(doc(db, "users", usuario.uid, "ratings", String(item.id)), itemToRate);
 
-    setRatings((prev) => {
-      const existingRatingIndex = prev.findIndex((r) => r.id === item.id);
-      let newList;
-      if (existingRatingIndex > -1) {
-        newList = [...prev];
-        newList[existingRatingIndex].rating = rating;
-      } else {
-        newList = [...prev, { ...item, rating }];
-      }
-      localStorage.setItem(storageKey, JSON.stringify(newList));
-      return newList;
-    });
+      setRatings((prev) => {
+        const existingRatingIndex = prev.findIndex((r) => r.id === item.id);
+        let newList;
+        if (existingRatingIndex > -1) {
+          newList = [...prev];
+          newList[existingRatingIndex].rating = rating;
+        } else {
+          newList = [...prev, itemToRate];
+        }
+        return newList;
+      });
+    } catch (e) {
+      console.error("Erro ao avaliar item: ", e);
+    }
   };
 
   const getRating = (itemId) => {

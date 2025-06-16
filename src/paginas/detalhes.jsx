@@ -1,11 +1,12 @@
 import { useEffect, useState, useContext } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import styles from "../styles/detalhes.module.css";
 import { useAuth } from "../hooks/useAuth";
 import { WatchLaterContext } from "../contexts/WatchLaterContext";
 import { FavoritesContext } from '../contexts/FavoritesContext';
 import { RatingsContext } from '../contexts/RatingsContext';
+import { HistoryContext } from "../contexts/HistoryContext";
 import HorizontalScroll from "../components/HorizontalScroll";
 
 export default function Detalhes() {
@@ -15,7 +16,6 @@ export default function Detalhes() {
   const [providers, setProviders] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
   
-  // Estados para temporadas e episódios
   const [selectedSeason, setSelectedSeason] = useState(null);
   const [episodes, setEpisodes] = useState([]);
   const [loadingEpisodes, setLoadingEpisodes] = useState(false);
@@ -24,31 +24,25 @@ export default function Detalhes() {
   const { addToWatchLater, removeFromWatchLater, isWatchLater } = useContext(WatchLaterContext);
   const { addToFavorites, removeFromFavorites, isFavorite } = useContext(FavoritesContext);
   const { rateItem, getRating } = useContext(RatingsContext);
+  const { addToHistory } = useContext(HistoryContext);
 
   const ehFavorito = dados ? isFavorite(dados.id) : false;
   const avaliacaoUsuario = dados ? getRating(dados.id) : 0;
   const estaSalvo = dados ? isWatchLater(dados.id) : false;
 
-  const handleWatchLater = () => {
-    if (!dados) return;
-    const item = { id: dados.id, title: dados.title || dados.name, poster_path: dados.poster_path, tipo: tipo };
-    estaSalvo ? removeFromWatchLater(dados.id) : addToWatchLater(item);
-  };
-
-  const handleFavorite = () => {
-    if (!dados) return;
-    const item = { id: dados.id, title: dados.title || dados.name, poster_path: dados.poster_path, tipo: tipo };
-    ehFavorito ? removeFromFavorites(dados.id) : addToFavorites(item);
-  };
-
-  const handleRating = (rating) => {
-    if (!dados) return;
-    const item = { id: dados.id, title: dados.title || dados.name, poster_path: dados.poster_path, tipo: tipo, runtime: dados.runtime, genres: dados.genres };
-    rateItem(item, rating);
+  const handleWatchLater = () => { if (!dados) return; const item = { id: dados.id, title: dados.title || dados.name, poster_path: dados.poster_path, tipo: tipo }; estaSalvo ? removeFromWatchLater(dados.id) : addToWatchLater(item); };
+  const handleFavorite = () => { if (!dados) return; const item = { id: dados.id, title: dados.title || dados.name, poster_path: dados.poster_path, tipo: tipo }; ehFavorito ? removeFromFavorites(dados.id) : addToFavorites(item); };
+  const handleRating = (rating) => { if (!dados) return; const item = { id: dados.id, title: dados.title || dados.name, poster_path: dados.poster_path, tipo: tipo, runtime: dados.runtime, genres: dados.genres }; rateItem(item, rating); };
+  
+  const handleAssistir = (path) => {
+    if (dados) {
+      const historyItem = { id: dados.id, title: dados.title || dados.name, poster_path: dados.poster_path, tipo: tipo, media_type: tipo };
+      addToHistory(historyItem);
+    }
+    navigate(path);
   };
 
   useEffect(() => {
-    // Reseta os estados para evitar mostrar dados antigos ao navegar para um novo item
     setDados(null);
     setRecommendations([]);
     setEpisodes([]);
@@ -66,7 +60,6 @@ export default function Detalhes() {
         setProviders(providersRes.data.results?.BR || null);
         setRecommendations(recommendationsRes.data.results);
         
-        // Se for uma série, define a primeira temporada como padrão
         if (detalhesRes.data.seasons) {
           const firstSeason = detalhesRes.data.seasons.find(s => s.season_number > 0) || detalhesRes.data.seasons[0];
           if (firstSeason) {
@@ -112,7 +105,6 @@ export default function Detalhes() {
     <div className={styles.container}>
       <button onClick={() => navigate(-1)} className={styles.backButton}>⬅ Voltar</button>
 
-      {/* --- CABEÇALHO PRINCIPAL COM POSTER E INFORMAÇÕES --- */}
       <div className={styles.header}>
         <img
           src={dados.poster_path ? `https://image.tmdb.org/t/p/w500${dados.poster_path}` : 'https://via.placeholder.com/500x750?text=Sem+Imagem'}
@@ -120,13 +112,12 @@ export default function Detalhes() {
           className={styles.poster}
         />
         
-        {/* --- BLOCO DE INFORMAÇÕES --- */}
         <div className={styles.info}>
           <h1 className={styles.title}>{dados.title || dados.name}</h1>
           
           <div className={styles.userActions}>
             {tipo === 'movie' && (
-              <button onClick={() => navigate(`/assistir/${tipo}/${dados.id}`)} className={styles.watchButton}>
+              <button onClick={() => handleAssistir(`/assistir/${tipo}/${dados.id}`)} className={styles.watchButton}>
                 ▶ Assistir Agora
               </button>
             )}
@@ -159,8 +150,6 @@ export default function Detalhes() {
         </div>
       </div>
 
-      {/* --- SEÇÕES ADICIONAIS --- */}
-
       {tipo === 'tv' && availableSeasons && availableSeasons.length > 0 && (
         <div className={styles.seasonsSection}>
           <h2 className={styles.sectionTitle}>Episódios</h2>
@@ -190,7 +179,7 @@ export default function Detalhes() {
                       <h3 className={styles.episodeTitle}>T{selectedSeason}:E{ep.episode_number} - {ep.name}</h3>
                       <button 
                         className={styles.playButton} 
-                        onClick={() => navigate(`/assistir/tv/${id}/${selectedSeason}/${ep.episode_number}`)}
+                        onClick={() => handleAssistir(`/assistir/tv/${id}/${selectedSeason}/${ep.episode_number}`)}
                         aria-label={`Assistir episódio ${ep.episode_number}`}
                       >
                         ▶
@@ -224,7 +213,7 @@ export default function Detalhes() {
         <h2 className={styles.sectionTitle}>Onde assistir</h2>
         {providers ? (
           <>
-            {providers.flatrate && (
+            {providers.flatrate && providers.flatrate.length > 0 && (
               <>
                 <h3 className={styles.providerSubTitle}>Streaming</h3>
                 <div className={styles.providerGrid}>
@@ -232,7 +221,7 @@ export default function Detalhes() {
                 </div>
               </>
             )}
-            {providers.rent && (
+            {providers.rent && providers.rent.length > 0 && (
               <>
                 <h3 className={styles.providerSubTitle}>Aluguel</h3>
                 <div className={styles.providerGrid}>
@@ -240,7 +229,7 @@ export default function Detalhes() {
                 </div>
               </>
             )}
-            {providers.buy && (
+            {providers.buy && providers.buy.length > 0 && (
               <>
                 <h3 className={styles.providerSubTitle}>Compra</h3>
                 <div className={styles.providerGrid}>

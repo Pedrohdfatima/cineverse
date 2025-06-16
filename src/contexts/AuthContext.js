@@ -1,77 +1,87 @@
 import React, { createContext, useState, useEffect } from "react";
+import { 
+  getAuth, 
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile
+} from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const usuarioLogado = localStorage.getItem("usuarioLogado");
-    if (usuarioLogado) {
-      setUsuario(JSON.parse(usuarioLogado));
-    }
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUsuario({
+          uid: user.uid,
+          email: user.email,
+          nome: user.displayName,
+        });
+      } else {
+        setUsuario(null);
+      }
+      setLoading(false);
+    });
+    return () => unsubscribe();
   }, []);
 
-  const getUsuarios = () => {
-    return JSON.parse(localStorage.getItem("usuarios")) || [];
+  const register = async (nome, email, password) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    
+    await updateProfile(user, {
+      displayName: nome,
+    });
+
+    const userDocRef = doc(db, "users", user.uid);
+    await setDoc(userDocRef, {
+      nome: nome,
+      email: email,
+      createdAt: new Date(),
+    });
+
+    // CORREÇÃO: Atualiza o estado local imediatamente após o registro
+    setUsuario({
+      uid: user.uid,
+      email: user.email,
+      nome: nome,
+    });
   };
 
-  const login = (email, senha) => {
-    const usuarios = getUsuarios();
-    const usuarioEncontrado = usuarios.find(
-      (u) => u.email === email && u.senha === senha
-    );
+  const login = async (email, password) => {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-    if (usuarioEncontrado) {
-      const dadosSessao = { email: usuarioEncontrado.email, nome: usuarioEncontrado.nome };
-      localStorage.setItem("usuarioLogado", JSON.stringify(dadosSessao));
-      setUsuario(dadosSessao);
-      return dadosSessao;
-    } else {
-      throw new Error("Email ou senha inválidos");
-    }
+    // CORREÇÃO: Atualiza o estado local imediatamente após o login
+    setUsuario({
+      uid: user.uid,
+      email: user.email,
+      nome: user.displayName,
+    });
   };
-
-  const register = (novoUsuario) => {
-    const usuarios = getUsuarios();
-    const emailExistente = usuarios.some((u) => u.email === novoUsuario.email);
-
-    if (emailExistente) {
-      throw new Error("Este email já está cadastrado.");
-    }
-
-    const novosUsuarios = [...usuarios, novoUsuario];
-    localStorage.setItem("usuarios", JSON.stringify(novosUsuarios));
-  };
-
-    const updateUser = (dadosAtualizados) => {
-    if (!usuario) throw new Error("Usuário não está logado.");
-
-    let usuarios = getUsuarios();
-    const indexUsuario = usuarios.findIndex((u) => u.email === usuario.email);
-
-    if (indexUsuario > -1) {
-      if (dadosAtualizados.nome) {
-        usuarios[indexUsuario].nome = dadosAtualizados.nome;
-      }
-      if (dadosAtualizados.senha) {
-        usuarios[indexUsuario].senha = dadosAtualizados.senha;
-      }
-      localStorage.setItem("usuarios", JSON.stringify(usuarios));
-    } else {
-      throw new Error("Usuário não encontrado.");
-    }
-  };
-
 
   const logout = () => {
-    localStorage.removeItem("usuarioLogado");
-    setUsuario(null);
+    return signOut(auth);
+  };
+  
+  const value = {
+    usuario,
+    loading,
+    login,
+    logout,
+    register,
   };
 
   return (
-    <AuthContext.Provider value={{ usuario, login, logout, register }}>
-      {children}
+    <AuthContext.Provider value={value}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 }

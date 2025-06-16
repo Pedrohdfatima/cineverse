@@ -10,15 +10,23 @@ export default function Cadastro() {
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  // A função agora é 'async' para esperar a resposta do Firebase
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (nome && email && senha) {
       try {
-        register({ nome, email, senha });
-        alert("Cadastro realizado com sucesso! Você será redirecionado para o login.");
-        navigate("/login");
+        // 'await' espera a função de registro terminar
+        await register(nome, email, senha);
+        
+        alert("Cadastro realizado com sucesso! Você será redirecionado para a página inicial.");
+        navigate("/"); // Redireciona para a home após o sucesso
+
       } catch (error) {
-        alert(error.message);
+        // Se o Firebase retornar um erro, ele será capturado aqui
+        console.error("Erro no cadastro:", error);
+        
+        // Exibe a mensagem de erro específica do Firebase para o usuário
+        alert(`Erro ao cadastrar: ${error.message}`);
       }
     }
   };
@@ -47,7 +55,7 @@ export default function Cadastro() {
           type="password"
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
-          placeholder="Senha"
+          placeholder="Senha (mínimo 6 caracteres)"
           required
           className={styles.input}
         />

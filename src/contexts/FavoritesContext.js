@@ -1,5 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { AuthContext } from './AuthContext';
+import { db } from '../firebase'; // Importa a instância do Firestore
+import { collection, doc, getDocs, setDoc, deleteDoc } from 'firebase/firestore';
 
 export const FavoritesContext = createContext();
 
@@ -7,42 +9,41 @@ export function FavoritesProvider({ children }) {
   const [favorites, setFavorites] = useState([]);
   const { usuario } = useContext(AuthContext);
 
-  const getStorageKey = () => {
-    if (!usuario) return null;
-    return `favorites_${usuario.email}`;
-  };
-
+  // Efeito para carregar os favoritos do Firestore quando o usuário loga
   useEffect(() => {
     if (usuario) {
-      const storageKey = getStorageKey();
-      const storedFavorites = JSON.parse(localStorage.getItem(storageKey)) || [];
-      setFavorites(storedFavorites);
+      const fetchFavorites = async () => {
+        const favoritesCol = collection(db, "users", usuario.uid, "favorites");
+        const favoriteSnapshot = await getDocs(favoritesCol);
+        const userFavorites = favoriteSnapshot.docs.map(doc => doc.data());
+        setFavorites(userFavorites);
+      };
+      fetchFavorites();
     } else {
+      // Limpa os favoritos se o usuário deslogar
       setFavorites([]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usuario]);
 
-  const addToFavorites = (item) => {
-    const storageKey = getStorageKey();
-    if (!storageKey) return;
-
-    setFavorites((prev) => {
-      const newList = [...prev, item];
-      localStorage.setItem(storageKey, JSON.stringify(newList));
-      return newList;
-    });
+  const addToFavorites = async (item) => {
+    if (!usuario) return;
+    try {
+      // Define um documento com o ID do filme/série
+      await setDoc(doc(db, "users", usuario.uid, "favorites", String(item.id)), item);
+      setFavorites(prev => [...prev, item]);
+    } catch (e) {
+      console.error("Erro ao adicionar favorito: ", e);
+    }
   };
 
-  const removeFromFavorites = (itemId) => {
-    const storageKey = getStorageKey();
-    if (!storageKey) return;
-
-    setFavorites((prev) => {
-      const newList = prev.filter((item) => item.id !== itemId);
-      localStorage.setItem(storageKey, JSON.stringify(newList));
-      return newList;
-    });
+  const removeFromFavorites = async (itemId) => {
+    if (!usuario) return;
+    try {
+      await deleteDoc(doc(db, "users", usuario.uid, "favorites", String(itemId)));
+      setFavorites(prev => prev.filter(item => item.id !== itemId));
+    } catch (e) {
+      console.error("Erro ao remover favorito: ", e);
+    }
   };
 
   const isFavorite = (itemId) => {

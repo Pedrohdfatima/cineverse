@@ -25,12 +25,14 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { WatchLaterProvider } from "./contexts/WatchLaterContext";
 import { FavoritesProvider } from "./contexts/FavoritesContext";
 import { RatingsProvider } from "./contexts/RatingsContext";
+import { HistoryProvider } from "./contexts/HistoryContext"; 
 
 import "./styles/global.css";
 
 function App() {
   return (
     <AuthProvider>
+      <HistoryProvider> 
       <WatchLaterProvider>
         <FavoritesProvider>
          <RatingsProvider>
@@ -59,6 +61,7 @@ function App() {
           </RatingsProvider>
         </FavoritesProvider>
       </WatchLaterProvider>
+      </HistoryProvider>
     </AuthProvider>
   );
 }

@@ -1,19 +1,30 @@
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useContext } from 'react';
+// ADICIONADO useLocation à importação
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import styles from '../styles/assistir.module.css';
+import { HistoryContext } from '../contexts/HistoryContext';
 
 export default function Assistir() {
-  // Pega os parâmetros da URL, com valores padrão para temporada e episódio
   const { tipo, id, season = '1', episode = '1' } = useParams();
   const navigate = useNavigate();
+  const location = useLocation(); // Agora a função está definida e pode ser usada
+  const { addToHistory } = useContext(HistoryContext);
+
+  const itemData = location.state?.item;
+
+  useEffect(() => {
+    if (itemData) {
+      addToHistory(itemData);
+    }
+  }, [itemData, addToHistory]);
 
   let src = '';
   if (tipo === 'movie') {
-    // Constrói a URL para filmes
     src = `https://vidsrc.icu/embed/movie/${id}`;
   } else if (tipo === 'tv') {
-    // Constrói a URL para séries, usando S1E1 como padrão
     src = `https://vidsrc.icu/embed/tv/${id}/${season}/${episode}`;
+  } else if (tipo === 'anime') {
+    src = `https://vidsrc.icu/embed/anime/${id}/${episode}`;
   }
 
   return (
@@ -34,13 +45,16 @@ export default function Assistir() {
           ></iframe>
         </div>
       ) : (
-        // Mensagem de erro caso o tipo seja inválido
         <p>Não foi possível carregar o vídeo.</p>
       )}
        {tipo === 'tv' && (
          <div className={styles.episodeNote}>
             <p>Atualmente exibindo a <strong>Temporada {season}, Episódio {episode}</strong>.</p>
-            <p>A funcionalidade de seleção de episódios poderá ser adicionada no futuro.</p>
+         </div>
+       )}
+       {tipo === 'anime' && (
+         <div className={styles.episodeNote}>
+            <p>Atualmente exibindo o <strong>Episódio {episode}</strong>.</p>
          </div>
        )}
     </div>

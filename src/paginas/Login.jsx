@@ -12,14 +12,18 @@ export default function Login() {
 
   const from = location.state?.from?.pathname || "/";
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (email && senha) {
       try {
-        login(email, senha);
+        await login(email, senha);
         navigate(from, { replace: true });
       } catch (error) {
-        alert(error.message);
+        console.error("Erro no login:", error);
+        
+        // Exibe a mensagem de erro específica do Firebase
+        // Ex: "auth/invalid-credential", "auth/user-not-found", etc.
+        alert(`Erro ao fazer login: ${error.message}`);
       }
     }
   };

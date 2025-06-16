@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import BannerSlider from "../components/BannerSlider";
-import HorizontalScroll from "../components/HorizontalScroll"; // <-- IMPORTAÇÃO ADICIONADA
+import HorizontalScroll from "../components/HorizontalScroll";
+import { useAuth } from "../hooks/useAuth";
+import { HistoryContext } from "../contexts/HistoryContext";
 import styles from "../styles/home.module.css";
 
 const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
@@ -20,6 +22,8 @@ const categorias = [
 
 export default function Home() {
   const [tendencias, setTendencias] = useState([]);
+  const { usuario } = useAuth();
+  const { history } = useContext(HistoryContext);
 
   useEffect(() => {
     const fetchTendencias = async () => {
@@ -42,18 +46,23 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <div className={styles.sliderWrapper}>
-        {/* O BannerSlider permanece o mesmo */}
         <BannerSlider dados={tendencias.slice(0, 5)} />
       </div>
 
-      {/* Seção de Tendências agora usa HorizontalScroll */}
+      {usuario && history.length > 0 && (
+        <HorizontalScroll
+          title="Continuar Assistindo"
+          initialData={history}
+          mediaType="movie" // Fallback, o tipo real vem do item
+        />
+      )}
+
       <HorizontalScroll
         title="Tendências da Semana"
         fetchUrl="https://api.themoviedb.org/3/trending/all/week"
-        mediaType="movie" // ou ajuste conforme necessário
+        mediaType="movie" 
       />
 
-      {/* Seções de Categoria agora usam HorizontalScroll */}
       {categorias.map((cat) => (
         <HorizontalScroll
           key={`movie-genre-${cat.id}`}
